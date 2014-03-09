@@ -155,7 +155,7 @@ toggle_option(struct view *view, enum request request, char msg[SIZEOF_STR])
  * View opening
  */
 
-static enum request run_prompt_command(struct view *view, char *cmd);
+static enum request run_prompt_command(struct view *view, const char *argv[]);
 
 static enum request
 open_run_request(struct view *view, enum request request)
@@ -173,11 +173,7 @@ open_run_request(struct view *view, enum request request)
 
 	if (argv_format(view->env, &argv, req->argv, FALSE, TRUE)) {
 		if (req->flags.internal) {
-			char cmd[SIZEOF_STR];
-
-			if (argv_to_string(argv, cmd, sizeof(cmd), " ")) {
-				request = run_prompt_command(view, cmd);
-			}
+			request = run_prompt_command(view, argv);
 		}
 		else {
 			confirmed = !req->flags.confirm;
@@ -644,9 +640,10 @@ open_pager_mode(enum request request)
 }
 
 static enum request
-run_prompt_command(struct view *view, char *cmd)
+run_prompt_command(struct view *view, const char *argv[])
 {
 	enum request request;
+	const char *cmd = argv[0];
 
 	if (!cmd)
 		return REQ_NONE;
@@ -684,20 +681,21 @@ run_prompt_command(struct view *view, char *cmd)
 
 	} else if (cmd[0] == '!') {
 		struct view *next = VIEW(REQ_VIEW_PAGER);
-		const char *argv[SIZEOF_ARG];
-		int argc = 0;
+		bool copied;
 
-		cmd++;
-		/* When running random commands, initially show the
-		 * command in the title. However, it maybe later be
-		 * overwritten if a commit line is selected. */
-		string_ncopy(next->ref, cmd, strlen(cmd));
+		/* Trim the leading '!'. */
+		argv[0] = cmd + 1;
+		copied = argv_format(view->env, &next->argv, argv, FALSE, TRUE);
+		argv[0] = cmd;
 
-		if (!argv_from_string(argv, &argc, cmd)) {
-			report("Too many arguments");
-		} else if (!argv_format(view->env, &next->argv, argv, FALSE, TRUE)) {
+		if (!copied) {
 			report("Argument formatting failed");
 		} else {
+			/* When running random commands, initially show the
+			 * command in the title. However, it maybe later be
+			 * overwritten if a commit line is selected. */
+			argv_to_string(next->argv, next->ref, sizeof(next->ref), " ");
+
 			next->dir = NULL;
 			open_view(view, REQ_VIEW_PAGER, OPEN_PREPARED);
 		}
@@ -707,16 +705,12 @@ run_prompt_command(struct view *view, char *cmd)
 		if (request != REQ_UNKNOWN)
 			return request;
 
-		char *args = strchr(cmd, ' ');
-		if (args) {
-			*args++ = 0;
-			if (set_option(cmd, args) == SUCCESS) {
-				request = !view->unrefreshable ? REQ_REFRESH : REQ_SCREEN_REDRAW;
-				if (!strcmp(cmd, "color"))
-					init_colors();
-				resize_display();
-				redraw_display(TRUE);
-			}
+		if (set_option(argv[0], argv_size(argv + 1), &argv[1]) == SUCCESS) {
+			request = !view->unrefreshable ? REQ_REFRESH : REQ_SCREEN_REDRAW;
+			if (!strcmp(cmd, "color"))
+				init_colors();
+			resize_display();
+			redraw_display(TRUE);
 		}
 		return request;
 	}
@@ -860,7 +854,13 @@ main(int argc, const char *argv[])
 		case REQ_PROMPT:
 		{
 			char *cmd = read_prompt(":");
-			request = run_prompt_command(view, cmd);
+			const char *argv[SIZEOF_ARG] = { NULL };
+			int argc = 0;
+
+			if (cmd && !argv_from_string(argv, &argc, cmd))
+				report("Too many arguments");
+			else
+				request = run_prompt_command(view, argv);
 			break;
 		}
 		case REQ_SEARCH:
