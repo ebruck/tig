@@ -22,43 +22,43 @@
  */
 
 #define OPTION_INFO(_) \
-	_(author_width,			int) \
-	_(blame_options,		const char **) \
-	_(commit_order,			enum commit_order) \
-	_(diff_context,			int) \
-	_(diff_options,			const char **) \
-	_(editor_line_number,		bool) \
-	_(focus_child,			bool) \
-	_(horizontal_scroll,		double) \
-	_(id_width,			int) \
-	_(ignore_case,			bool) \
-	_(ignore_space,			enum ignore_space) \
-	_(line_graphics,		enum graphic) \
-	_(line_number_interval,		int) \
-	_(mouse,			bool) \
-	_(mouse_scroll,			int) \
-	_(read_git_colors,		bool) \
-	_(scale_vsplit_view,		double) \
-	_(show_author,			enum author) \
-	_(show_changes,			bool) \
-	_(show_date,			enum date) \
-	_(show_file_size,		enum file_size) \
-	_(show_filename,		enum filename) \
-	_(show_filename_width,		int) \
-	_(show_id,			bool) \
-	_(show_line_numbers,		bool) \
-	_(show_notes,			bool) \
-	_(show_refs,			bool) \
-	_(show_rev_graph,		bool) \
-	_(split_view_height,		double) \
-	_(status_untracked_dirs,	bool) \
-	_(tab_size,			int) \
-	_(title_overflow,		int) \
-	_(vertical_split,		enum vertical_split) \
-	_(wrap_lines,			bool) \
-	_(file_filter,			bool) \
+	_(author_width,			int,			VIEW_NO_FLAGS) \
+	_(blame_options,		const char **,		VIEW_NO_FLAGS) \
+	_(commit_order,			enum commit_order,	VIEW_LOG_LIKE) \
+	_(diff_context,			int,			VIEW_DIFF_LIKE) \
+	_(diff_options,			const char **,		VIEW_NO_FLAGS) \
+	_(editor_line_number,		bool,			VIEW_NO_FLAGS) \
+	_(file_filter,			bool,			VIEW_DIFF_LIKE | VIEW_LOG_LIKE) \
+	_(focus_child,			bool,			VIEW_NO_FLAGS) \
+	_(horizontal_scroll,		double,			VIEW_NO_FLAGS) \
+	_(id_width,			int,			VIEW_NO_FLAGS) \
+	_(ignore_case,			bool,			VIEW_NO_FLAGS) \
+	_(ignore_space,			enum ignore_space,	VIEW_DIFF_LIKE) \
+	_(line_graphics,		enum graphic,		VIEW_NO_FLAGS) \
+	_(line_number_interval,		int,			VIEW_NO_FLAGS) \
+	_(mouse,			bool,			VIEW_NO_FLAGS) \
+	_(mouse_scroll,			int,			VIEW_NO_FLAGS) \
+	_(read_git_colors,		bool,			VIEW_NO_FLAGS) \
+	_(scale_vsplit_view,		double,			VIEW_NO_FLAGS) \
+	_(show_author,			enum author,		VIEW_NO_FLAGS) \
+	_(show_changes,			bool,			VIEW_NO_FLAGS) \
+	_(show_date,			enum date,		VIEW_NO_FLAGS) \
+	_(show_file_size,		enum file_size,		VIEW_NO_FLAGS) \
+	_(show_filename,		enum filename,		VIEW_NO_FLAGS) \
+	_(show_filename_width,		int,			VIEW_NO_FLAGS) \
+	_(show_id,			bool,			VIEW_NO_FLAGS) \
+	_(show_line_numbers,		bool,			VIEW_NO_FLAGS) \
+	_(show_notes,			bool,			VIEW_NO_FLAGS) \
+	_(show_refs,			bool,			VIEW_NO_FLAGS) \
+	_(show_rev_graph,		bool,			VIEW_LOG_LIKE) \
+	_(split_view_height,		double,			VIEW_NO_FLAGS) \
+	_(status_untracked_dirs,	bool,			VIEW_STATUS_LIKE) \
+	_(tab_size,			int,			VIEW_NO_FLAGS) \
+	_(title_overflow,		int,			VIEW_NO_FLAGS) \
+	_(vertical_split,		enum vertical_split,	VIEW_FLAG_RESET_DISPLAY) \
+	_(wrap_lines,			bool,			VIEW_NO_FLAGS) \
 
-#define DEFINE_OPTION_EXTERNS(name, type) extern type opt_##name;
+#define DEFINE_OPTION_EXTERNS(name, type, flags) extern type opt_##name;
 OPTION_INFO(DEFINE_OPTION_EXTERNS);
 
 /*
