@@ -56,6 +56,7 @@
 	_(title_overflow,		int) \
 	_(vertical_split,		enum vertical_split) \
 	_(wrap_lines,			bool) \
+	_(file_filter,			bool) \
 
 #define DEFINE_OPTION_EXTERNS(name, type) extern type opt_##name;
 OPTION_INFO(DEFINE_OPTION_EXTERNS);
@@ -64,7 +65,6 @@ OPTION_INFO(DEFINE_OPTION_EXTERNS);
  * Global state variables.
  */
 
-extern bool opt_file_filter;
 extern iconv_t opt_iconv_out;
 extern char opt_editor[SIZEOF_STR];
 extern const char **opt_cmdline_argv;
